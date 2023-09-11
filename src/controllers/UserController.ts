@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import { hash } from "bcrypt"
-import { prisma } from '../prisma'
+import prisma from '../prisma'
 import { CustomRequest } from "../middlewares/Auth"
 
 async function GetAllUsers(request:Request, response:Response){
@@ -32,18 +32,26 @@ async function GetAllUsers(request:Request, response:Response){
     } catch (error) {
         return response.json(error)
     }
-    
 }
 
 
 async function GetUser(request:CustomRequest, response:Response){
     try {
         const GetUser = await prisma.user.findMany({ 
-            where: { id: request.userId },
+            where: { 
+                id: request.userId 
+            },
             select: {
                 id: true,
                 name: true,
                 email: true,
+                posts: true,
+                profile: {
+                    select: {
+                        id: true,
+                        bio: true
+                    }
+                }
             }
         })
 

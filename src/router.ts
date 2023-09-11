@@ -1,21 +1,20 @@
 import { Response, Router } from "express";
 import { CustomRequest, verifyToken }   from "./middlewares/Auth"
-import { prisma } from "./prisma";
 
 import Auth from "./controllers/AuthController";
 import User from "./controllers/UserController"
 import Post  from "./controllers/PostController"
-import Profile from "./controllers/ProfileController";
 
 const router = Router()
 
 //Auth
 
 router.get("/verify", verifyToken, async (request: CustomRequest, response:Response) => {
-
-    // const User = await prisma.user.findUnique({ where: { id: Number(request.userId) }})
-  
-    return response.status(200).json({ auth: true, msg : `Bem vindos`, user: request.userId })
+    return response.status(200).json({ 
+        auth: true, 
+        msg : `Bem vindos`, 
+        user: request.userId 
+    })
 })
 // Authetication
 
@@ -37,13 +36,8 @@ router.delete("/user/:id", User.Delete)
 
 //Posts
 
-router.get("/post", verifyToken, Post.GetAllUserPost)
+router.get("/post/:id", Post.GetAllUserPost)
 
 router.post("/post/:id", Post.Create)
-
-// Profile
-
-router.get("/profile", verifyToken, Profile.GetProfile)
-
 
 export { router } 

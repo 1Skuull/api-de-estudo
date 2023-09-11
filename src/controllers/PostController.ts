@@ -1,13 +1,15 @@
 import { Request, Response } from "express";
-import { prisma } from '../prisma'
+import prisma from '../prisma'
 import { CustomRequest } from "../middlewares/Auth";
 
 
 async function GetAllUserPost(request:CustomRequest, response:Response){
+    const { id } = request.params
+
     const GetPost = await prisma.post.findMany({
         where: { 
             author: { 
-                id: request.userId 
+                id: parseInt(id)
             }
         },
         select: { 

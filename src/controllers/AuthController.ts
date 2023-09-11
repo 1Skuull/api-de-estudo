@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken"
 import { Request, Response } from "express"
-import { compare, hash } from "bcrypt"
-import { prisma } from '../prisma'
+import bcrypt from "bcrypt"
+import prisma  from '../prisma'
 
 
 async function login(request:Request, response:Response){
@@ -14,7 +14,7 @@ async function login(request:Request, response:Response){
             return response.json({ error: true, message: "Campo esta vazio" });
         }
 
-        const isPassword = await compare(password, String(User?.password))
+        const isPassword = await bcrypt.compare(password, String(User?.password))
 
         if (!isPassword || User?.email !== email) {
             return response.json({ error: true, message: "Email ou senha incorreta" });
@@ -31,7 +31,6 @@ async function login(request:Request, response:Response){
         return response.json(error)
     
     }
-    
 }
 
 
@@ -55,7 +54,7 @@ async function register(request:Request, response:Response){
             return response.json({ error: true, message: "Email ja cadastrado" })
         }
         
-        const hashPassword = await hash(password, 8)
+        const hashPassword = await bcrypt.hash(password, 8)
 
         Users = await prisma.user.create({ data: { name, email, password: hashPassword }})
 

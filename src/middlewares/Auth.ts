@@ -1,8 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { verify } from "jsonwebtoken"
 
-export const secretKey = 'AS2F5A5DDS542FG556ASDE78AF5F1V6ASDG5SCV1ESF8FDSFE589DF4SD6F4DS8F4SD656F46';
-
 export interface CustomRequest extends Request {
   userId?: number;
 }
