@@ -2,33 +2,13 @@ import { Request, Response } from "express"
 import { hash } from "bcrypt"
 import prisma from '../prisma'
 import { CustomRequest } from "../middlewares/Auth"
+import { GetAllUsers, GetUserById } from "../repositorys/UserRepository"
 
-async function GetAllUsers(request:Request, response:Response){
+async function AllUsers(request:Request, response:Response){
     try {
-        const allUsers = await prisma.user.findMany({ 
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                posts: { 
-                    select: {
-                        id: true,
-                        title: true,
-                        content: true
-                    }
-                },
-                profile: {
-                    select: { 
-                        id: true,
-                        bio: true
-                    }
-                }
+        const AllUsers = await GetAllUsers()
 
-            }
-        })
-
-        return response.status(200).json({ allUsers }) 
-    
+        return response.status(200).json(AllUsers) 
     } catch (error) {
         return response.json(error)
     }
@@ -37,26 +17,9 @@ async function GetAllUsers(request:Request, response:Response){
 
 async function GetUser(request:CustomRequest, response:Response){
     try {
-        const GetUser = await prisma.user.findMany({ 
-            where: { 
-                id: request.userId 
-            },
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                posts: true,
-                profile: {
-                    select: {
-                        id: true,
-                        bio: true
-                    }
-                }
-            }
-        })
+        const UserById = await GetUserById(request.userId)
 
-        return response.status(200).json({ user: GetUser }) 
-    
+        return response.status(200).json(UserById) 
     } catch (error) {
         return response.json(error)
     }
@@ -67,15 +30,15 @@ async function GetUser(request:CustomRequest, response:Response){
 async function Update(request:Request, response:Response) {
     try {
         const { id } = request.params
-        const { name, password }= request.body
+        const { name, password, bio, email }= request.body
         
-        const user = await prisma.user.findUnique({ where: { id: Number(id) } })
+        let user = await prisma.user.findUnique({ where: { id: Number(id) } })
 
         if(user?.name === name){
             return response.json({ error: true, message: "Usuario já possui esse nome" })
         }
 
-        const hashPassword = await hash(password, 8)
+        // const hashPassword = await hash(password, 8)
 
         await prisma.user.update({
             where: { 
@@ -83,14 +46,17 @@ async function Update(request:Request, response:Response) {
             },
             data: { 
                 name, 
-                password: hashPassword 
+                bio,
+                email,
+                // password: hashPassword
             }
         })
 
-        return response.status(200).json({ error: false, message: "Usuarios alterado com sucesso" })
+        return response.status(200).json({ error: false, message: "Usuario alterado com sucesso" })
     
     } catch (error) {
-        return response.json(error)
+        console.log(error)
+        return response.status(400).json("erro")
     
     }
     
@@ -119,4 +85,4 @@ async function Delete(request:Request, response:Response) {
 }
 
 
-export default { GetAllUsers, GetUser, Update, Delete }
+export default { AllUsers, GetUser, Update, Delete }

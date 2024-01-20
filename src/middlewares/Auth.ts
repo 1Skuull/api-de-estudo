@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { verify } from "jsonwebtoken"
+import jwt from "jsonwebtoken"
 
 export interface CustomRequest extends Request {
   userId?: number;
@@ -16,7 +16,7 @@ export function verifyToken(request: CustomRequest, response: Response, next: Ne
     return response.json({ auth: false, msg: 'Token inválido.' });
   }
 
-  verify(token, process.env.KEY_TOKEN as string, (err: any, decoded: any) => {
+  jwt.verify(token, process.env.KEY_TOKEN as string, (err: any, decoded: any) => {
     if (err) {
       response.clearCookie("token");
       return response.json({ auth: false, msg: 'Usuário não cadastrado! Token inválido.' });

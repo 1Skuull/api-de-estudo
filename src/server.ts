@@ -17,8 +17,8 @@ app.use(router)
 
 app.listen(9191, () => {
   try {
-    console.log("API CONECTADA")
+    console.log("API ONLINE")
   } catch (error) {
-    console.log(`Error de conexão: ${error}`)
+    console.log(`Error de conexão com a API: ${error}`)
   }
 })
