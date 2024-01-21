@@ -36,7 +36,7 @@ async function login(request:Request, response:Response){
 
 async function logout(request: Request, response: Response) {
     response.clearCookie("token");
-    return response.status(200).json({ message: "Cookie deletado com sucesso." });
+    return response.status(200).json({ message: "Cookie deletado." });
 }
 
 

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import prisma from '../prisma'
 import { CustomRequest } from "../middlewares/Auth";
+import { GetFullUserById } from "../repositorys/UserRepository";
 
 
 async function GetAllBios(request:Request, response:Response) {
@@ -66,13 +67,9 @@ async function Update(request:Request, response:Response) {
     const { text } = request.body
     const { id } = request.params
 
-    const findId = await prisma.user.findUnique({ 
-        where: { 
-            id: parseInt(id)
-        } 
-    })
+    const findById = await GetFullUserById(Number(id))
 
-    if(!findId){
+    if(!findById){
         return response.status(200).json({ error: true, message: "Bio nao existe"})
     }
 
@@ -91,13 +88,9 @@ async function Update(request:Request, response:Response) {
 async function Delete(request:Request, response:Response) {
     const { id } = request.params
 
-    const findId = await prisma.user.findUnique({ 
-        where: { 
-            id: parseInt(id) 
-        } 
-    })
+    const findById = await GetFullUserById(Number(id))
 
-    if(!findId){
+    if(!findById){
         return response.status(200).json({ error: true, message: "Bio nao existe"})
     }
 

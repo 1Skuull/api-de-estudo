@@ -17,7 +17,7 @@ async function AllUsers(request:Request, response:Response){
 
 async function GetUser(request:CustomRequest, response:Response){
     try {
-        const UserById = await GetUserById(request.userId)
+        const UserById = await GetUserById(Number(request.userId))
 
         return response.status(200).json(UserById) 
     } catch (error) {
@@ -32,7 +32,7 @@ async function Update(request:Request, response:Response) {
         const { id } = request.params
         const { name, password, bio, email }= request.body
         
-        let user = await prisma.user.findUnique({ where: { id: Number(id) } })
+        let user = await prisma.user.findFirst({ where: { id: Number(id) } })
 
         if(user?.name === name){
             return response.json({ error: true, message: "Usuario já possui esse nome" })

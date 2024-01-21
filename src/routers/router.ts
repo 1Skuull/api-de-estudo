@@ -1,11 +1,11 @@
 import { Response, Router } from "express";
-import { CustomRequest, verifyToken }   from "./middlewares/Auth"
+import { CustomRequest, verifyToken }   from "../middlewares/Auth"
 
-import Auth from "./controllers/AuthController";
-import User from "./controllers/UserController"
-import Post  from "./controllers/PostController"
-import Bio  from "./controllers/BioController"
-import LikeController from "./controllers/LikeController";
+import Auth from "../controllers/AuthController";
+import User from "../controllers/UserController"
+import Post  from "../controllers/PostController"
+import Bio  from "../controllers/BioController"
+import LikeController from "../controllers/LikeController";
 
 const router = Router()
 
@@ -50,7 +50,8 @@ router.delete("/post/:id", Post.Delete)
 
 
 
-router.get("/like/:id", LikeController.NewLike)
+router.get("/like/:id", verifyToken, LikeController.NewLike)
 router.get("/likes", LikeController.AllLikes)
+router.delete("/like/:id", LikeController.RemoveLike)
 
-export { router } 
+export default router  

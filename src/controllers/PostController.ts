@@ -1,55 +1,23 @@
 import { Request, Response } from "express";
 import prisma from '../prisma'
 import { CustomRequest } from "../middlewares/Auth";
+import { GetAllPosts, GetPostById } from "../repositorys/PostRepository";
+import { GetFullUserById } from "../repositorys/UserRepository";
 
 
 async function GetAllUserPost(request:CustomRequest, response:Response){
-    const GetAllPost = await prisma.post.findMany({
-        select: { 
-            id: true,
-            title: true,
-            content: true,
-            author: {
-                select: { 
-                    id: true,
-                    name: true 
-                }
-            }
-        }
-    })
+    const GetAllPost = await GetAllPosts()
 
-    return response.status(200).json({ GetAllPost })
+    return response.status(200).json(GetAllPost)
 }
 
 
 async function GetUserPost(request:CustomRequest, response:Response){
     const { id } = request.params
 
-    const GetPost = await prisma.post.findMany({
-        where: { 
-            author: { 
-                id: parseInt(id)
-            }
-        },
-        select: { 
-            id: true,
-            title: true,
-            content: true,
-            likes: true,
-            comment: true,
-            author: {
-                select: { 
-                    id: true,
-                    image: true,
-                    name: true 
-                }
-            }
-        }
-    })
+    const GetPost = await GetPostById(id)
 
-   
-
-    return response.status(200).json({ GetPost })
+    return response.status(200).json(GetPost)
 }
 
 
@@ -58,7 +26,7 @@ async function Create(request:Request, response:Response){
         const { title, content } = request.body
         const { id } = request.params
 
-        if (!title || !content || !id) {
+        if (!content || !id) {
             return response.status(400).json({ error: true, message: "Dados inválidos" });
         }
 
@@ -90,7 +58,11 @@ async function Update(request:Request, response:Response){
     const { title, content } = request.body
     const { id } = request.params
 
-    const findId = await prisma.post.findUnique({where: { id: parseInt(id)}})
+    const findId = await prisma.post.findUnique({
+        where: { 
+            id: parseInt(id)
+        }
+    })
 
     if(!findId){
         return response.status(200).json({ error: true, message: "Post nao existe"})

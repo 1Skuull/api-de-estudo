@@ -14,10 +14,10 @@ export async function GetAllUsers():Promise<any>{
     return GetAll
 }
 
-export async function GetUserById(id:any):Promise<any>{
+export async function GetUserById(id:number):Promise<any>{
     const GetById = await prisma.user.findUnique({ 
         where: { 
-            id 
+            id: Number(id) 
         },
         select: {
             id: true,
@@ -34,4 +34,13 @@ export async function GetUserById(id:any):Promise<any>{
     })
 
     return GetById
+}
+
+
+export async function GetFullUserById(id:number):Promise<any>{
+    return await prisma.user.findUnique({ 
+        where: { 
+            id: Number(id) 
+        },
+    })
 }
