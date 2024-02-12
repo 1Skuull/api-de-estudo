@@ -22,7 +22,7 @@ export function verifyToken(request: CustomRequest, response: Response, next: Ne
       return response.json({ auth: false, msg: 'Usuário não cadastrado! Token inválido.' });
     }
     
-    request.userId = decoded.id;
+    request.userId = decoded.userId;
     next();
 
   });

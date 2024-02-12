@@ -2,13 +2,14 @@ import jwt from "jsonwebtoken"
 import { Request, Response } from "express"
 import bcrypt from "bcrypt"
 import prisma  from '../prisma'
+import { GetUserByEmailWithPassword, createUser } from "../repositorys/UserRepository"
 
 
 async function login(request:Request, response:Response){
     try {
         const { email, password } = request.body
 
-        const User = await prisma.user.findUnique({ where: { email }})
+        const User = await GetUserByEmailWithPassword(email)
         
         if(!password || !email){
             return response.json({ error: true, message: "Campo esta vazio" });
@@ -20,7 +21,7 @@ async function login(request:Request, response:Response){
             return response.json({ error: true, message: "Email ou senha incorreta" });
         }
         
-        const token = jwt.sign({ id: User?.id, expiresIn: '1h' }, process.env.KEY_TOKEN as string );
+        const token = jwt.sign({ userId: User?.id, expiresIn: '1h' }, process.env.KEY_TOKEN as string );
         
         response.cookie('token', token, { maxAge: 3600000, httpOnly: false });
         
@@ -44,7 +45,7 @@ async function register(request:Request, response:Response){
     try {
         const { name, email, password, confirmPassword } = request.body
 
-        let Users = await prisma.user.findUnique({ where: { email }})
+        const Users = await GetUserByEmailWithPassword(email)
         
         if(confirmPassword !== password){
             return response.json({ error: true, message: "As senhas são diferentes" })
@@ -56,7 +57,8 @@ async function register(request:Request, response:Response){
         
         const hashPassword = await bcrypt.hash(password, 8)
 
-        Users = await prisma.user.create({ data: { name, email, password: hashPassword }})
+        // Users = await prisma.user.create({ data: { name, email, password: hashPassword }})
+        await createUser({ name, email, password: hashPassword })
 
         return response.status(200).json({ error: false, message: "Cadastrado com sucesso"})
     

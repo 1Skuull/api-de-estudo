@@ -1,16 +1,16 @@
 import { Request, Response } from "express";
 import prisma from '../prisma'
 import { CustomRequest } from "../middlewares/Auth";
-import { GetFullUserById } from "../repositorys/UserRepository";
+import { GetUserById } from "../repositorys/UserRepository";
 
 
-async function GetAllBios(request:Request, response:Response) {
+async function GetAll(request:Request, response:Response) {
     const GetAllBios = await prisma.bio.findMany()
 
     return response.status(200).json(GetAllBios)
 }
 
-async function GetBio(request:CustomRequest, response:Response) {
+async function Get(request:CustomRequest, response:Response) {
     const { id } = request.params
 
     const GetBio = await prisma.bio.findMany({
@@ -48,7 +48,7 @@ async function Create(request:Request, response:Response) {
                 text,
                 author: {
                     connect: {
-                        id: parseInt(id)
+                        id: Number(id)
                     }
                 }
             }
@@ -67,15 +67,15 @@ async function Update(request:Request, response:Response) {
     const { text } = request.body
     const { id } = request.params
 
-    const findById = await GetFullUserById(Number(id))
+    const findById = await GetUserById(Number(id))
 
     if(!findById){
-        return response.status(200).json({ error: true, message: "Bio nao existe"})
+        return response.status(200).json({ error: true, message: "Usuario nao existe"})
     }
 
     await prisma.bio.update({ 
         where: { 
-            authorId: parseInt(id) 
+            userId: Number(id) 
         },
         data: { 
             text
@@ -88,7 +88,7 @@ async function Update(request:Request, response:Response) {
 async function Delete(request:Request, response:Response) {
     const { id } = request.params
 
-    const findById = await GetFullUserById(Number(id))
+    const findById = await GetUserById(Number(id))
 
     if(!findById){
         return response.status(200).json({ error: true, message: "Bio nao existe"})
@@ -96,11 +96,11 @@ async function Delete(request:Request, response:Response) {
 
     await prisma.bio.delete({
         where: { 
-            authorId: parseInt(id)
+            userId: Number(id)
         }
     })
 
     return response.status(200).json({ error: false, message: "Bio limpa" })
 }
 
-export default { GetAllBios, GetBio, Create, Update, Delete }
+export default { GetAll, Get, Create, Update, Delete }

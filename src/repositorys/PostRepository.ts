@@ -1,3 +1,4 @@
+import { Post } from '@prisma/client'
 import prisma from '../prisma'
 
 
@@ -13,7 +14,8 @@ export async function GetAllPosts():Promise<any>{
                     id: true,
                     name: true 
                 }
-            }
+            },
+            createdAt: true
         }
     })
 
@@ -21,37 +23,61 @@ export async function GetAllPosts():Promise<any>{
 }
 
 
-export async function GetPostById(id:any):Promise<any>{
-    const GetPost = await prisma.post.findFirst({
+export async function GetPostById(id:number):Promise<any>{
+    const GetPost = await prisma.post.findMany({
+        orderBy: {
+            createdAt: 'desc'
+        },
         where: { 
             author: { 
-                id: parseInt(id)
+                id: Number(id)
             }
         },
         select: { 
             id: true,
             title: true,
             content: true,
-            likes: {
-                select: {
-                    author: {
-                        select: {
-                            id: true,
-                            name: true
-                        }
-                    }
-                }
-            },
             comment: true,
+            createdAt: true,
+            likes: {
+                orderBy: {
+                    author: {
+                        createdAt: 'desc'
+                    }
+                },
+            },
             author: {
                 select: { 
                     id: true,
                     image: true,
                     name: true 
                 }
-            }
+            },
         }
     })
 
     return GetPost
+}
+
+export async function createPost(data:any):Promise<Post | null>{
+    return await prisma.post.create({ data })
+}
+
+
+export async function updatePost(id:number, data:any):Promise<Post | null>{
+    return await prisma.post.update({
+        where: {
+            id
+        },
+        data
+    })
+}
+
+
+export async function deletePost(id:number):Promise<Post | null>{
+    return await prisma.post.delete({
+        where: {
+            id
+        },
+    })
 }

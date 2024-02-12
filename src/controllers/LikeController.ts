@@ -7,7 +7,9 @@ async function NewLike(request:CustomRequest, response:Response) {
         const { id } = request.params
 
         const post = await prisma.post.findUnique({
-            where: { id: Number(id) },
+            where: { 
+                id: Number(id) 
+            },
         });
 
         if (!post) {
@@ -17,7 +19,7 @@ async function NewLike(request:CustomRequest, response:Response) {
         const existingLike = await prisma.like.findFirst({
             where: {
                 postId: Number(id),
-                authorId: Number(request.userId),
+                userId: Number(request.userId),
             },
         });
     
@@ -28,9 +30,10 @@ async function NewLike(request:CustomRequest, response:Response) {
         await prisma.like.create({
             data: {
                 postId: Number(id),
-                authorId: Number(request.userId) 
+                userId: Number(request.userId) 
             },
         })
+
         return response.status(200).json({ error: false, message: "Bah like" })
     } catch (error) {
         console.error(error)
@@ -40,9 +43,17 @@ async function NewLike(request:CustomRequest, response:Response) {
 
 async function AllLikes(request:Request, response:Response) { 
     const likes = await prisma.like.findMany({
-        where: { postId: 2 },
+        where: { 
+            postId: 3 
+        },
         select: {
-            author: { select: { name: true }}
+            // post: {select: {id: true, content:true}},
+            author: { 
+                select: { 
+                    id: true,
+                    name: true 
+                }
+            }
         }
       });
     return response.status(200).json(likes)
@@ -55,5 +66,19 @@ async function RemoveLike(request:Request, response:Response) {
 
     return response.status(200).json({ error: false, message: "Like Removido" })
 }
+
+
+export async function getLikeCount(postId: number): Promise<number> {
+    const likeCount = await prisma.like.count({
+        where: {
+            postId: postId,
+        },
+    });
+
+    console.log(likeCount)
+
+    return likeCount;
+}
+// getLikeCount(2)
 
 export default { NewLike, AllLikes, RemoveLike }

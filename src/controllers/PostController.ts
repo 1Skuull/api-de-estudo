@@ -1,21 +1,19 @@
 import { Request, Response } from "express";
 import prisma from '../prisma'
 import { CustomRequest } from "../middlewares/Auth";
-import { GetAllPosts, GetPostById } from "../repositorys/PostRepository";
-import { GetFullUserById } from "../repositorys/UserRepository";
+import { GetAllPosts, GetPostById, createPost, deletePost, updatePost } from "../repositorys/PostRepository";
 
 
-async function GetAllUserPost(request:CustomRequest, response:Response){
+async function GetAll(request:CustomRequest, response:Response){
     const GetAllPost = await GetAllPosts()
 
     return response.status(200).json(GetAllPost)
 }
 
-
-async function GetUserPost(request:CustomRequest, response:Response){
+async function Get(request:CustomRequest, response:Response){
     const { id } = request.params
 
-    const GetPost = await GetPostById(id)
+    const GetPost = await GetPostById(parseInt(id))
 
     return response.status(200).json(GetPost)
 }
@@ -30,16 +28,13 @@ async function Create(request:Request, response:Response){
             return response.status(400).json({ error: true, message: "Dados inválidos" });
         }
 
-
-        await prisma.post.create({ 
-            data: {
-                title, 
-                content,
-                published: true,
-                author: { 
-                    connect: { 
-                        id : parseInt(id) 
-                    }
+        await createPost({
+            title, 
+            content,
+            published: true,
+            author: { 
+                connect: { 
+                    id : parseInt(id) 
                 }
             }
         })
@@ -53,25 +48,17 @@ async function Create(request:Request, response:Response){
 }
 
 
-
 async function Update(request:Request, response:Response){
     const { title, content } = request.body
     const { id } = request.params
 
-    const findId = await prisma.post.findUnique({
-        where: { 
-            id: parseInt(id)
-        }
-    })
+    const findId = await GetPostById(parseInt(id))
 
     if(!findId){
         return response.status(200).json({ error: true, message: "Post nao existe"})
     }
 
-    await prisma.post.update({
-        where: { id: Number(id) },
-        data: { title, content }
-    })
+    await updatePost(Number(id), { title, content })
 
     return response.status(200).json({ error: false, message: "Post atualizado" })
 }
@@ -80,23 +67,16 @@ async function Update(request:Request, response:Response){
 async function Delete(request:Request, response:Response){
     const { id } = request.params
 
-    const findId = await prisma.post.findUnique({where: { id: parseInt(id)}})
+    const findId = await GetPostById(parseInt(id))
 
     if(!findId){
         return response.status(200).json({ error: true, message: "Post nao existe"})
     }
 
-    await prisma.post.delete({
-        where: { 
-            id: parseInt(id)
-        }
-    })
+    await deletePost(parseInt(id))
 
     return response.status(200).json({ error: false, message: "Post deletado" })
 }
 
 
-
-
-
-export default { GetUserPost, GetAllUserPost, Create, Update, Delete }
+export default { Get, GetAll, Create, Update, Delete }
