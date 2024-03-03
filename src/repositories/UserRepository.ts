@@ -69,7 +69,7 @@ export async function deleteUser(id:number):Promise<User | null>{
 }
 
 export async function GetUserByIdWithPassword(id:number):Promise<User | null>{
-    return await prisma.user.findUnique({ 
+    return await prisma.user.findFirst({ 
         where: { 
             id 
         },

@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken"
 import { Request, Response } from "express"
 import bcrypt from "bcrypt"
 import prisma  from '../prisma'
-import { GetUserByEmailWithPassword, createUser } from "../repositorys/UserRepository"
+import { GetUserByEmailWithPassword, createUser } from "../repositories/UserRepository"
 
 
 async function login(request:Request, response:Response){
@@ -45,13 +45,13 @@ async function register(request:Request, response:Response){
     try {
         const { name, email, password, confirmPassword } = request.body
 
-        const Users = await GetUserByEmailWithPassword(email)
+        const User = await GetUserByEmailWithPassword(email)
         
         if(confirmPassword !== password){
             return response.json({ error: true, message: "As senhas são diferentes" })
         }
 
-        if(Users){
+        if(User){
             return response.json({ error: true, message: "Email ja cadastrado" })
         }
         

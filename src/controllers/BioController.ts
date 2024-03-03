@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import prisma from '../prisma'
 import { CustomRequest } from "../middlewares/Auth";
-import { GetUserById } from "../repositorys/UserRepository";
+import { GetUserById } from "../repositories/UserRepository";
 
 
 async function GetAll(request:Request, response:Response) {

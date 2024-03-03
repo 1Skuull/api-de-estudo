@@ -2,9 +2,16 @@ import { Post } from '@prisma/client'
 import prisma from '../prisma'
 
 
+export async function GetPostById(id:number):Promise<any>{
+    return await prisma.post.findFirst({ where: { id } })
+}
+
+
 export async function GetAllPosts():Promise<any>{
-    
     const GetAllPosts = await prisma.post.findMany({
+        orderBy: {
+            createdAt: 'desc'
+        },
         select: { 
             id: true,
             title: true,
@@ -23,29 +30,19 @@ export async function GetAllPosts():Promise<any>{
 }
 
 
-export async function GetPostById(id:number):Promise<any>{
-    const GetPost = await prisma.post.findMany({
+export async function GetPostsByIdOfUser(id:number):Promise<any>{
+    const GetPosts = await prisma.post.findMany({
         orderBy: {
             createdAt: 'desc'
         },
         where: { 
-            author: { 
-                id: Number(id)
-            }
+            userId: Number(id)
         },
         select: { 
             id: true,
             title: true,
             content: true,
-            comment: true,
             createdAt: true,
-            likes: {
-                orderBy: {
-                    author: {
-                        createdAt: 'desc'
-                    }
-                },
-            },
             author: {
                 select: { 
                     id: true,
@@ -53,14 +50,26 @@ export async function GetPostById(id:number):Promise<any>{
                     name: true 
                 }
             },
+            _count: {
+                select: {
+                    likes: true, 
+                    comment: true
+                }
+            },
         }
     })
 
-    return GetPost
+    return GetPosts
 }
 
-export async function createPost(data:any):Promise<Post | null>{
-    return await prisma.post.create({ data })
+export async function createPost(id:number, body:any):Promise<Post | null>{
+    return await prisma.post.create({ 
+        data: {
+            ...body, 
+            published: true,
+            userId: Number(id)
+        }
+    })
 }
 
 

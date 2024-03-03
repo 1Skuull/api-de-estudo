@@ -2,11 +2,11 @@ import { Request, Response } from "express";
 import prisma from '../prisma'
 import { CustomRequest } from "../middlewares/Auth"
 
-async function NewLike(request:CustomRequest, response:Response) {
+async function LikePost(request:CustomRequest, response:Response) {
     try {
         const { id } = request.params
 
-        const post = await prisma.post.findUnique({
+        const post = await prisma.post.findFirst({
             where: { 
                 id: Number(id) 
             },
@@ -37,14 +37,16 @@ async function NewLike(request:CustomRequest, response:Response) {
         return response.status(200).json({ error: false, message: "Bah like" })
     } catch (error) {
         console.error(error)
-        return response.status(200).json({ error: true, message: "Não dá pra curtir doidão" })
+        return response.status(400).json({ error, message: "Não dá pra curtir doidão" })
     }
 }
 
 async function AllLikes(request:Request, response:Response) { 
+    const { id } = request.params
+    
     const likes = await prisma.like.findMany({
         where: { 
-            postId: 3 
+            postId: parseInt(id) 
         },
         select: {
             // post: {select: {id: true, content:true}},
@@ -56,6 +58,7 @@ async function AllLikes(request:Request, response:Response) {
             }
         }
       });
+
     return response.status(200).json(likes)
 }
 
@@ -63,6 +66,8 @@ async function RemoveLike(request:Request, response:Response) {
     const { id } = request.params
 
     await prisma.like.delete({ where: { id: Number(id) } })
+
+    
 
     return response.status(200).json({ error: false, message: "Like Removido" })
 }
@@ -79,6 +84,6 @@ export async function getLikeCount(postId: number): Promise<number> {
 
     return likeCount;
 }
-// getLikeCount(2)
+// getLikeCount(1)
 
-export default { NewLike, AllLikes, RemoveLike }
+export default { LikePost, AllLikes, RemoveLike }

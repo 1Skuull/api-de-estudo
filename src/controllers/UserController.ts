@@ -1,8 +1,7 @@
 import { Request, Response } from "express"
-import { hash } from "bcrypt"
-import prisma from '../prisma'
 import { CustomRequest } from "../middlewares/Auth"
-import { GetAllUsers, GetUserById, GetUserByIdWithPassword, deleteUser, updateUser } from "../repositorys/UserRepository"
+import { GetAllUsers, GetUserById, GetUserByIdWithPassword, deleteUser, updateUser } from "../repositories/UserRepository"
+import bcrypt from "bcrypt"
 
 
 async function GetAll(request:Request, response:Response){
@@ -13,7 +12,7 @@ async function GetAll(request:Request, response:Response){
 
         return response.status(200).json(AllUsers) 
     } catch (error) {
-        return response.json(error)
+        return response.status(400).json(error)
     }
 }
 
@@ -24,7 +23,7 @@ async function Get(request:CustomRequest, response:Response){
 
         return response.status(200).json(UserById) 
     } catch (error) {
-        return response.json(error)
+        return response.status(400).json(error)
     }
     
 }
@@ -33,30 +32,28 @@ async function Get(request:CustomRequest, response:Response){
 async function Update(request:Request, response:Response) {
     try {
         const { id } = request.params
-        const { name, password, bio, email }= request.body
+        const { name, password, email }= request.body
         
         let user = await GetUserByIdWithPassword(Number(id))
 
-        if(user?.name === name){
-            return response.json({ error: true, message: "Usuario já possui esse nome" })
+        if(!user) {
+            return response.status(400).json({ error: true, message: "Usuario não existe" })
         }
 
-        // const hashPassword = await hash(password, 8)
-
+        if(user?.name === name){
+            return response.status(400).json({ error: true, message: "Usuario já possui esse nome" })
+        }
 
         await updateUser(Number(id), { 
             name, 
-            bio,
             email,
-            // password: hashPassword
+            // password: await bcrypt.hash(password, 8)
         })
 
-
-        return response.status(200).json({ error: false, message: "Usuario alterado com sucesso" })
-    
+        return response.status(201).json({ error: false, message: "Usuario alterado com sucesso" })
     } catch (error) {
         console.log(error)
-        return response.status(400).json("erro")
+        return response.status(400).json({error, message: "Erro ao atualiza usuario"})
     
     }
     
@@ -70,17 +67,14 @@ async function Delete(request:Request, response:Response) {
         const user = await GetUserById(Number(id))
     
         if(!user){
-            return response.json({ error: true, message: "Usuario não existe" })
+            return response.status(400).json({ error: true, message: "Usuario não existe" })
         }
     
         await deleteUser(Number(id))
         
         return response.status(200).json({ error: false, message: "Usuarios deletado com sucesso" }) 
-    
     } catch (error) {
-        
-        return response.json(error)
-    
+        return response.status(400).json(error)
     }
 }
 

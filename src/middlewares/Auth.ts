@@ -6,10 +6,10 @@ export interface CustomRequest extends Request {
 }
 
 export function verifyToken(request: CustomRequest, response: Response, next: NextFunction) {
-  // const authHeader = request.headers.authorization;
-  // const token = authHeader && authHeader.split(' ')[1];
+  const authHeader = request.headers.authorization;
+  const token = authHeader && authHeader.split(' ')[1];
 
-  const token = request.cookies.token;
+  // const token = request.cookies.token;
 
   if (!token) {
     response.clearCookie("token");
