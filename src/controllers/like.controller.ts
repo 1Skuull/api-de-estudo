@@ -2,7 +2,9 @@ import { Request, Response } from "express";
 import prisma from '../prisma'
 import { CustomRequest } from "../middlewares/Auth"
 
-async function LikePost(request:CustomRequest, response:Response) {
+
+
+async function likePost(request:CustomRequest, response:Response) {
     try {
         const { id } = request.params
 
@@ -24,7 +26,13 @@ async function LikePost(request:CustomRequest, response:Response) {
         });
     
         if (existingLike) {
-            return response.status(400).json({ error: true, message: 'Você já curtiu esse post' });
+            await prisma.like.delete({
+                where: {
+                    id: Number(existingLike.id),
+                },
+            });
+
+            return response.status(200).json({ error: false, message: 'Deslike realizado com sucesso' });
         }
     
         await prisma.like.create({
@@ -37,53 +45,40 @@ async function LikePost(request:CustomRequest, response:Response) {
         return response.status(200).json({ error: false, message: "Bah like" })
     } catch (error) {
         console.error(error)
-        return response.status(400).json({ error, message: "Não dá pra curtir doidão" })
+        return response.status(400).json({ error, message: "Deu erro na curtida doidão" })
     }
 }
 
-async function AllLikes(request:Request, response:Response) { 
+
+async function getAllLikesOfUser(request:Request, response:Response) { 
     const { id } = request.params
     
     const likes = await prisma.like.findMany({
         where: { 
-            postId: parseInt(id) 
+            userId: parseInt(id) 
         },
         select: {
-            // post: {select: {id: true, content:true}},
-            author: { 
-                select: { 
+            post: {
+                select: {
                     id: true,
-                    name: true 
+                    image: true,
+                    title: true,
+                    content: true,
+                    author: { 
+                        select: {
+                            id: true,
+                            name: true
+                        }
+                    }
                 }
-            }
+            },
+            
         }
       });
 
     return response.status(200).json(likes)
 }
 
-async function RemoveLike(request:Request, response:Response) {
-    const { id } = request.params
-
-    await prisma.like.delete({ where: { id: Number(id) } })
-
-    
-
-    return response.status(200).json({ error: false, message: "Like Removido" })
-}
 
 
-export async function getLikeCount(postId: number): Promise<number> {
-    const likeCount = await prisma.like.count({
-        where: {
-            postId: postId,
-        },
-    });
-
-    console.log(likeCount)
-
-    return likeCount;
-}
-// getLikeCount(1)
-
-export default { LikePost, AllLikes, RemoveLike }
+export default { likePost, getAllLikesOfUser }

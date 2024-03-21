@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "server": "ts-node-dev --quiet --clear ./src/server.ts"
+    "dev": "ts-node-dev --quiet --clear ./src/server.ts"
   },
   "author": "",
   "license": "ISC",

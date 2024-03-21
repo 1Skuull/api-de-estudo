@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import { CustomRequest } from "../middlewares/Auth"
-import { GetAllUsers, GetUserById, GetUserByIdWithPassword, deleteUser, updateUser } from "../repositories/UserRepository"
+import { GetAllUsers, GetUserById, GetUserByIdWithPassword, deleteUser, updateUser } from "../repositories/user.repository"
 import bcrypt from "bcrypt"
 
 

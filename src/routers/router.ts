@@ -1,12 +1,12 @@
 import { Response, Router } from "express";
 import { CustomRequest, verifyToken }   from "../middlewares/Auth"
 
-import Auth from "../controllers/AuthController";
-import User from "../controllers/UserController"
-import Post from "../controllers/PostController"
-import Bio from "../controllers/BioController"
-import LikeController from "../controllers/LikeController";
-import Comment from "../controllers/CommentController";
+import Auth from "../controllers/auth.controller";
+import User from "../controllers/user.controller"
+import Post from "../controllers/post.controller"
+import Bio from "../controllers/bio.controller"
+import Like from "../controllers/like.controller";
+import Comment from "../controllers/comment.controller";
 
 const router = Router()
 
@@ -30,7 +30,7 @@ router.post("/login", Auth.login)
 router.post("/register", Auth.register)
 router.get("/logout", verifyToken, Auth.logout);
 
-//Users
+//User
 
 router.get("/user", verifyToken, User.Get)
 router.get("/users", User.GetAll)
@@ -57,12 +57,11 @@ router.delete("/post/:id", Post.Delete)
 
 router.get("/comment/:id", Comment.Get)
 router.get("/comment", Comment.GetAll)
-router.post("/come/:id", Comment.Create)
+router.post("/comment/:id", verifyToken, Comment.Create)
 
 //Like
 
-router.get("/like/:id", verifyToken, LikeController.LikePost)
-router.get("/likes/:id", LikeController.AllLikes)
-router.delete("/like/:id", LikeController.RemoveLike)
+router.get("/like/:id", verifyToken, Like.likePost)
+router.get("/likes/:id", Like.getAllLikesOfUser)
 
 export default router  

@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken"
 import { Request, Response } from "express"
 import bcrypt from "bcrypt"
 import prisma  from '../prisma'
-import { GetUserByEmailWithPassword, createUser } from "../repositories/UserRepository"
+import { GetUserByEmailWithPassword, createUser } from "../repositories/user.repository"
 
 
 async function login(request:Request, response:Response){

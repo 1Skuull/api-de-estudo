@@ -16,13 +16,19 @@ export async function GetAllPosts():Promise<any>{
             id: true,
             title: true,
             content: true,
+            createdAt: true,
             author: {
                 select: { 
                     id: true,
                     name: true 
                 }
             },
-            createdAt: true
+            _count: {
+                select: {
+                    likes: true, 
+                    comment: true
+                }
+            },
         }
     })
 

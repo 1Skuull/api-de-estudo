@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { CustomRequest } from "../middlewares/Auth";
-import { GetPostById, GetAllPosts, GetPostsByIdOfUser, createPost, deletePost, updatePost } from "../repositories/PostRepository";
-import { GetUserById } from "../repositories/UserRepository";
+import { GetPostById, GetAllPosts, GetPostsByIdOfUser, createPost, deletePost, updatePost } from "../repositories/post.repository";
+import { GetUserById } from "../repositories/user.repository";
 
 
 async function GetAll(request:CustomRequest, response:Response){
